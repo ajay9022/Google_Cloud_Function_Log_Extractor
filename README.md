@@ -33,3 +33,24 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6. Colourise the Function_names buttons based on reading the logs present inside the textField rather than the logic written inside the API call list_entries() inside ret.py.
 
+
+
+
+
+<br />
+<br />
+<br />
+
+
+
+
+### References:
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://googleapis.dev/python/logging/latest/index.html <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://googleapis.dev/python/logging/latest/client.html <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://github.com/googleapis/python-logging/tree/master/samples/snippets <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://cloud.google.com/logging/docs/view/advanced-queries <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://googleapis.dev/python/logging/latest/handlers.html <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and ofcourse https://stackoverflow.com/ :D
