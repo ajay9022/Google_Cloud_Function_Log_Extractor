@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+<!-- done with ascending order of logs -->
+<!--  -->
+
+<br><br>
+<br><br>
+Registry :  <select id="reg"  onchange="choice1()">
+	        	<option selected="selected">None</option> 
+			</select>
+Module Name : <select id="module" disabled onchange="reset()"></select>
+SM Name : <select id="sm" disabled onchange="reset()"></select>
+<!-- <button id="getlogs">GetLogs</button> -->
+<br><br>
+<br><br>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js">
+	window.alllogs = [];//global variable containing the logs of the selected registry, SM and Module. It gets reset/empty after the registry from drop-down is changed.
+    
+</script>
+
+
+<script>
+	// var reg_list = config['reg_list'];
+	 
+	var reg_list = {{ config['reg_list'] | tojson }};
+
+	var select_reg = document.getElementById('reg');
+	
+
+	for (var i = 0; i < reg_list.length; i++) { 
+        var option = reg_list[i];
+        var el = document.createElement("option"); 
+        el.textContent = option;
+        el.value = option;
+        select_reg.appendChild(el);
+    }
+
+    
+</script>
+<script type="text/javascript">
+	function reset(){
+		clearTextField();
+		window.alllogs = [];
+        // Object.keys(alllogs).forEach(function(i) { delete person[i]});
+	}
+</script>
+<script type="text/javascript">
+ 	function choice1(){
+ 		// document.write($("#reg :selected").text());
+ 		// alert("ga");
+
+ 		$('#buttonsdiv').empty();
+ 		$('#module').empty();
+        $('#sm').empty();
+        clearTextField();
+        window.alllogs = [];
+        // Object.keys(alllogs).forEach(function(i) { delete person[i]});
+ 		if($("#reg :selected").text() == "None"){
+ 			// alert("GOGO")
+ 			document.getElementById("module").disabled=true;
+ 			document.getElementById("sm").disabled=true;
+ 			document.getElementById("Extract_Logs").disabled=true;
+ 			return 0;
+ 		}
+
+ 		document.getElementById("module").disabled=false;
+ 		document.getElementById("sm").disabled=false;
+ 		document.getElementById("Extract_Logs").disabled=false;
+
+ 		var curreg = $("#reg :selected").text();
+
+ 		
+ 		// var module_list = config[curreg];
+ 		// alert(module_list);
+		var config = {{ config | tojson }};
+		// alert(curreg);
+		var reg_dict = JSON.parse(config[curreg]);
+		// alert(Object.keys(config[curreg]));
+		
+		// alert(typeof config[curreg]);
+		// alert(typeof dic)
+		// alert(config['curreg']['sm_list']);
+		// alert(JSON.stringify(sm_list));
+
+		// document.write(dic['frequency']);
+		// document.write(typeof dic['sm_list']);
+		module_list = reg_dict['module_list'];
+		sm_list = reg_dict['sm_list'];
+		// alert(module_list);
+		// alert(sm_list);
+ 		var select_module = document.getElementById('module');
+		var select_sm = document.getElementById('sm');
+
+		for (var i = 0; i < module_list.length; i++) { 
+	        var option = module_list[i]; 
+	        var el = document.createElement("option"); 
+	        el.textContent = option; 
+	        el.value = option; 
+	        select_module.appendChild(el); 
+	    }
+	    for (var i = 0; i < sm_list.length; i++) { 
+	        var option = sm_list[i]; 
+	        var el = document.createElement("option"); 
+	        el.textContent = option; 
+	        el.value = option; 
+	        select_sm.appendChild(el); 
+	    } 
+
+	    var cf_list = reg_dict['cf_list'];
+		// alert(cf_list);
+		// document.write(typeof cf_list)
+		// document.write(cf_list.length);
+		
+		
+		
+		for (i = 0; i < cf_list.length; i++) { 
+
+			var btn = document.createElement("BUTTON");
+			btn.id = cf_list[i];
+		    btn.textContent = cf_list[i];
+
+		    document.getElementById("buttonsdiv").appendChild(btn);
+		    // alert("added");
+	    	
+		    // document.write("<br/>");
+		    
+		} 
+		// $('#buttonsdiv div').empty();
+
+ 		// alert("gogo");
+	    // alert(select.options[select.selectedIndex].text);
+	}
+</script>
+
+<script>  
+   $(document).ready(function(){
+
+        $('#Extract_Logs').click(function(){
+        	var btn = document.getElementById('Extract_Logs');
+        	btn.disabled = true;
+
+        	var cur_module = document.querySelector('#module'); 
+            var current_module = cur_module.value;
+
+            var cur_sm = document.querySelector('#sm'); 
+            var current_sm = cur_sm.value;
+
+            var cur_registry = document.querySelector('#reg');
+            var current_registry = cur_registry.value;
+
+			var cur_autorefresh = document.querySelector('#AutoRefresh');
+            var current_autorefresh = cur_autorefresh.value;
+            
+            // alert(current_sm);
+            $.ajax({
+              type: 'GET',
+              url: '/extract_logs/'+current_module+"/"+current_sm+"/"+current_registry+"/"+current_autorefresh,
+
+              success: function(data){
+              	$('#Extract_Logs').prop('disabled', false);
+
+                $.each(data, function(key, value){
+                	// alert(typeof value);
+     
+                	// alert(key+"---"+value);
+                    
+                	if(key == "logs"){
+            			// alert("value");
+			           	var input = $("#logsid");
+			           	for(i = 0; i < value.length; ++i){
+			           		// alert(input.val());
+			           		row = [];
+			           		if(i == 0 && input.val().length > 0){
+			           			// alert("go");
+			           			continue;
+			           		}
+			           		// alert(i);
+			           		for(j = 0; j < value[i].length; ++j){
+			           			// alert(value[i][j]);
+			           			row.push("\""+value[i][j]+"\"");
+				        		input.val(input.val() + value[i][j]);
+				        		input.val(input.val() + "\t\t\t");
+				           	}
+				           	input.val(input.val() + "\n");
+
+                            window.alllogs.push(row.join(','));
+                            // alert(window.alllogs);
+                            // input.val("---------\n"+ window.alllogs + "----------\n");
+				           	var psconsole = $('#logsid');//scroll to the bottom 
+				           	if(psconsole.length){ 
+				           		psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+				           	}
+			           	}
+			           	// document.write(alllogs);
+            		}
+            		else{
+						for(i = 0; i < value.length && key != "logs"; ++i){
+							// alert('\'#'+value[i]+'\'');
+	                		// alert(value[i]);
+	                		// alert($('\'#'+value[i]+'\'').length);
+	                		
+	                		// else 
+	                		if($("#"+value[i]).length){         // use this if you are using id to check
+	                			
+		                		if(key == 'completed_cfs'){
+		                			// alert(value[i]+"red");
+									$("#"+value[i]).css('background-color', 'red');
+			                	}
+			                	else if(key == 'running_cfs'){
+			                		// alert(value[i]+"green");
+			                		$("#"+value[i]).css('background-color', 'green');
+			                	}
+			                	else if(key == 'notrun_cfs'){
+			                		// alert(value[i]+"grey");
+			                		$("#"+value[i]).css('background-color', 'grey');
+			                	}
+			                	else{
+
+			                	}	
+		                	}
+	                	}//end of key function(i)
+	                }
+	            });//end of data function(key, value)
+              }//success
+            });//ajax
+        });//click
+   });
+</script>
+
+
+
+
+
+<!-- Export Functionality -->
+<script>  
+
+   $(document).ready(function(){
+
+        $('#save').click(function(){
+            var textToWrite = document.getElementById('logsid').innerHTML;
+		    var textFileAsBlob = new Blob([ textToWrite ], { type: 'text/plain' });
+		    var date = new Date(new Date().getTime() - 2*24*60*60*1000).toLocaleDateString(); // 11/14/2015
+		    var time = new Date(new Date().getTime() + 4*60*60*1000).toLocaleTimeString(); // 3:18:48 PM or 15:18:48
+
+		    var fileNameToSaveAs = "Log"+date+" "+time+".csv";
+		    
+		    var csvString = alllogs.join("\r\n");
+		    // document.write(csvString);
+		    
+            var downloadLink = document.createElement('a');//
+            downloadLink.href = 'data:attachment/csv,' + csvString;
+            downloadLink.target      = '_blank';
+            downloadLink.download    = fileNameToSaveAs;//
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        });
+   });
+</script>
+<script>
+	
+	function clearTextField(){
+        document.getElementById("logsid").value = "";
+	}
+</script>
+<button type="button" id="save">Export</button>
+<button type="button" id="Extract_Logs" disabled>Extract Logs</button>
+<button type="button" id="clear" onclick="clearTextField()">Clear</button>
+AutoRefresh<select id="AutoRefresh">
+	<option>Yes</option> 
+	<option selected="selected">No</option> 
+</select>
+<div id="buttonsdiv"></div>
+<textarea id="logsid" rows="30" cols="150" wrap="off">
+</textarea>
+
+</body>
+
+</html>
